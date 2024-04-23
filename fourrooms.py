@@ -36,6 +36,19 @@ wwwwwwwwwwwww
         self.action_space = spaces.Discrete(4)
         self.observation_space = spaces.Box(low=0., high=1., shape=(np.sum(self.occupancy == 0),))
 
+        '''
+        This part of code is for visualization of the four room environment for the layout could be not clear enough.
+
+        If you modified the layout and want to visualize it again, uncomment the following code.
+        '''
+        # import matplotlib.pyplot as plt
+        # plt.figure(figsize=(5, 5))  # Adjust the figure size as needed
+        # X, Y = np.meshgrid(np.arange(self.occupancy.shape[1]+1), np.arange(self.occupancy.shape[0]+1))
+        # plt.pcolormesh(X, Y, self.occupancy, cmap='binary', edgecolor='gray')  # 'gray' edgecolor for separation
+        # plt.xticks([]), plt.yticks([])  # Hide the tick marks
+        # plt.savefig('fourroom.png', bbox_inches='tight', pad_inches=0)
+        # plt.close()  # Close the plot to free up resources
+
         self.directions = [np.array((-1,0)), np.array((1,0)), np.array((0,-1)), np.array((0,1))]
         self.rng = np.random.RandomState(1234)
 

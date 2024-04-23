@@ -26,3 +26,11 @@ pytorch>=1.12.1
 tensorboard>=2.0.2
 gym>=0.15.3
 ```
+
+## Updated env rebuild
+
+My Python version is 3.8.10 and if you wan to rebuild the environment, please use conda env with
+
+```
+pip install -r requirements.txt
+```
