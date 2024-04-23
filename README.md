@@ -34,3 +34,7 @@ My Python version is 3.8.10 and if you wan to rebuild the environment, please us
 ```
 pip install -r requirements.txt
 ```
+
+## Incoming implementation
+
+The origin repo provide three training env: Fourroom; Cartpole; Atari Pong game. So, as my research object has always been focusing on algorithm deployment on Robot Arm, the learned option will be tested on  physical mycobot.
