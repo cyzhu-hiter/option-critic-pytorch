@@ -94,25 +94,73 @@ for idx, ax in enumerate(axes.flatten()):
         cell = env.tocell[i]
         option_prob[cell] = model.terminations(model.get_state(one_hot_state))[:, idx].sigmoid()
 
-    # Normalize the termination probabilities
-    # norm = plt.Normalize(vmin=np.nanmin(option_prob), vmax=np.nanmax(option_prob))
-    # print(np.nanmax(option_prob))
+ # Create the colormap that will be used for all subplots
+cmap = plt.cm.viridis
+cmap.set_bad(color='black')  # Color for the walls
 
-    # Choose a colormap with better contrast
-    # 'plasma' is a good choice for representing a range of probabilities
-    cmap = plt.cm.viridis
-    cmap.set_bad(color='black')
+# Compute the global min and max termination probabilities for normalization
+global_min = np.nanmin(option_prob)
+global_max = np.nanmax(option_prob)
 
-    # Plot the heatmap with the specified normalization and colormap
-    cax = ax.imshow(option_prob, cmap=cmap, interpolation='none', vmin=0, vmax=1)
+# Plot the termination probabilities
+for idx, ax in enumerate(axes.flatten()):
+    option_prob = np.full(env.occupancy.shape, np.nan)  # Initialize with NaN for the walls
 
-    # Optional: Create a colorbar for each subplot to show the scale
-    fig.colorbar(cax, ax=ax)
+    for i in range(env.observation_space.shape[0]):
+        one_hot_state = torch.zeros(env.observation_space.shape)
+        one_hot_state[i] = 1
+        cell = env.tocell[i]
+        # Get the termination probability for the current state and option
+        option_prob[cell] = model.terminations(model.get_state(one_hot_state))[:, idx].sigmoid()
+
+    # Normalize the probabilities using the global min and max
+    norm = plt.Normalize(vmin=global_min, vmax=global_max)
+
+    # Plot the heatmap with normalized probabilities
+    cax = ax.imshow(option_prob, cmap=cmap, interpolation='none', norm=norm)
 
     ax.set_title(f'Option {idx + 1}')
     ax.axis('off')  # Turn off the axis
 
-plt.tight_layout()
-plt.savefig(f'figs/{args.env}_termination_{num_options}op_prev.png', bbox_inches='tight', pad_inches=0)
-# Show the plot if desired and uncomment the following line
-# plt.show()  
+# Create a single colorbar for all subplots, placed on the right side of the figure
+fig.subplots_adjust(right=0.8)  # Adjust the layout to make space for the colorbar
+cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])  # Position the colorbar
+fig.colorbar(cax, cax=cbar_ax)  # Create the colorbar
+
+plt.suptitle('Termination Probabilities Over Options')  # Main title for the figure
+plt.savefig(f'figs/{args.env}_termination_{num_options}op.png', bbox_inches='tight', pad_inches=0)
+
+def log_norm(data):
+    # Use a small offset to avoid taking the log of zero
+    data_offset = data + 1e-6
+    log_data = np.log(data_offset)
+    return (log_data - np.nanmin(log_data)) / (np.nanmax(log_data) - np.nanmin(log_data))
+
+# # Plot the termination probabilities
+# fig, axes = plt.subplots(2, int(num_options / 2), figsize=(10, 10))  # Adjust the layout based on the number of options
+
+# for idx, ax in enumerate(axes.flatten()):
+#     # Create an option-specific probability grid with NaN for walls
+#     option_prob = np.full(env.occupancy.shape, np.nan)
+
+#     for i in range(env.observation_space.shape[0]):
+#         one_hot_state = torch.zeros(env.observation_space.shape)
+#         one_hot_state[i] = 1
+
+#         cell = env.tocell[i]
+#         option_prob[cell] = model.terminations(model.get_state(one_hot_state))[:, idx].sigmoid()
+
+#     # Apply log normalization
+#     log_normalized_policy_grid = log_norm(option_prob)
+
+#     cmap = plt.cm.viridis
+#     cmap.set_bad(color='black')
+
+#     # Plot the heatmap
+#     ax.imshow(log_normalized_policy_grid, cmap=cmap, interpolation='none', vmin=0, vmax=1)
+
+#     ax.set_title(f'Option {idx + 1}')
+#     ax.axis('off')  # Turn off the axis
+
+# plt.tight_layout()
+# plt.savefig(f'figs/{args.env}_termination_{num_options}op.png', bbox_inches='tight', pad_inches=0)

@@ -15,7 +15,8 @@ from logger import TensorboardLogger, WandbLogger, EmptyLogger
 import time
 
 parser = argparse.ArgumentParser(description="Option Critic PyTorch")
-parser.add_argument('--env', default='CartPole-v0', help='ROM to run')
+parser.add_argument('--env', default='fourrooms', help='ROM to run')
+# parser.add_argument('--env', default='CartPole-v0', help='ROM to run')
 parser.add_argument('--optimal-eps', type=float, default=0.05, help='Epsilon when playing optimally')
 parser.add_argument('--frame-skip', default=4, type=int, help='Every how many frames to process')
 parser.add_argument('--lr-type',type=str, default='fixed', choices= ['fixed', 'linear', 'exponential'],
